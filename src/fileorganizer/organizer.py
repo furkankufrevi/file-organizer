@@ -1,17 +1,7 @@
-#!/usr/bin/env python3
-"""
-File Organizer CLI — Automatically sort files into folders by type.
+"""Core file organizing logic."""
 
-Usage:
-    python organize.py ~/Downloads
-    python organize.py ~/Downloads --dry-run
-    python organize.py ~/Downloads --undo
-"""
-
-import argparse
 import json
 import shutil
-import sys
 from pathlib import Path
 
 CATEGORIES = {
@@ -44,6 +34,7 @@ LOG_FILE = ".file_organizer_log.json"
 
 
 def get_category(ext: str) -> str:
+    """Return the category name for a given file extension."""
     ext = ext.lower()
     for category, extensions in CATEGORIES.items():
         if ext in extensions:
@@ -52,6 +43,7 @@ def get_category(ext: str) -> str:
 
 
 def organize(target_dir: Path, dry_run: bool = False) -> list[dict]:
+    """Organize files in target_dir into category subfolders."""
     moves = []
     for item in target_dir.iterdir():
         if item.is_dir() or item.name.startswith("."):
@@ -61,7 +53,6 @@ def organize(target_dir: Path, dry_run: bool = False) -> list[dict]:
         dest_dir = target_dir / category
         dest_file = dest_dir / item.name
 
-        # Handle name conflicts
         if dest_file.exists():
             stem = item.stem
             suffix = item.suffix
@@ -80,11 +71,11 @@ def organize(target_dir: Path, dry_run: bool = False) -> list[dict]:
     return moves
 
 
-def undo(target_dir: Path) -> None:
+def undo(target_dir: Path) -> int:
+    """Undo the last organize operation. Returns number of restored files."""
     log_path = target_dir / LOG_FILE
     if not log_path.exists():
-        print("No log file found. Nothing to undo.")
-        sys.exit(1)
+        return -1
 
     with open(log_path, encoding="utf-8") as f:
         moves = json.load(f)
@@ -96,57 +87,17 @@ def undo(target_dir: Path) -> None:
             shutil.move(str(dest), str(src))
             restored += 1
 
-    # Clean up empty category folders
     for category in list(CATEGORIES.keys()) + ["Other"]:
         cat_dir = target_dir / category
         if cat_dir.is_dir() and not any(cat_dir.iterdir()):
             cat_dir.rmdir()
 
     log_path.unlink()
-    print(f"Restored {restored} file(s).")
+    return restored
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Organize files in a directory by type."
-    )
-    parser.add_argument("directory", help="Target directory to organize")
-    parser.add_argument(
-        "--dry-run", action="store_true",
-        help="Preview changes without moving files",
-    )
-    parser.add_argument("--undo", action="store_true", help="Undo the last organize operation")
-    args = parser.parse_args()
-
-    target = Path(args.directory).expanduser().resolve()
-    if not target.is_dir():
-        print(f"Error: '{target}' is not a valid directory.")
-        sys.exit(1)
-
-    if args.undo:
-        undo(target)
-        return
-
-    moves = organize(target, dry_run=args.dry_run)
-
-    if not moves:
-        print("No files to organize.")
-        return
-
-    label = "Would move" if args.dry_run else "Moved"
-    for move in moves:
-        src_name = Path(move["src"]).name
-        dest_folder = Path(move["dest"]).parent.name
-        print(f"  {label}: {src_name} -> {dest_folder}/")
-
-    print(f"\n{label} {len(moves)} file(s).")
-
-    if not args.dry_run:
-        log_path = target / LOG_FILE
-        with open(log_path, "w", encoding="utf-8") as f:
-            json.dump(moves, f, indent=2)
-        print("Undo log saved. Run with --undo to revert.")
-
-
-if __name__ == "__main__":
-    main()
+def save_log(target_dir: Path, moves: list[dict]) -> None:
+    """Save the move log for undo support."""
+    log_path = target_dir / LOG_FILE
+    with open(log_path, "w", encoding="utf-8") as f:
+        json.dump(moves, f, indent=2)

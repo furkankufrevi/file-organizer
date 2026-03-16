@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "messy2tidy"
+version = "0.1.0"
+description = "A simple CLI that organizes messy folders by sorting files into categorized subfolders."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Furkan Kufrevi" },
+]
+keywords = ["file", "organizer", "cli", "sort", "cleanup", "downloads"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Desktop Environment :: File Managers",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/furkankufrevi/file-organizer"
+Repository = "https://github.com/furkankufrevi/file-organizer"
+Issues = "https://github.com/furkankufrevi/file-organizer/issues"
+
+[project.scripts]
+fileorganizer = "fileorganizer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

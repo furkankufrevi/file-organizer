@@ -2,26 +2,26 @@
 
 A simple, zero-dependency Python CLI that organizes messy folders by sorting files into categorized subfolders.
 
-## Features
+## Installation
 
-- Sorts files into folders: Images, Documents, Videos, Audio, Archives, Code, Executables, Fonts, Data, Other
-- **Dry-run mode** — preview what will happen before moving anything
-- **Undo** — revert the last organize operation with a single command
-- Handles filename conflicts automatically
-- Skips hidden files and subdirectories
-- No external dependencies — pure Python 3.10+
+```bash
+pip install messy2tidy
+```
 
 ## Usage
 
 ```bash
 # Organize your Downloads folder
-python organize.py ~/Downloads
+fileorganizer ~/Downloads
 
 # Preview changes without moving anything
-python organize.py ~/Downloads --dry-run
+fileorganizer ~/Downloads --dry-run
 
 # Undo the last operation
-python organize.py ~/Downloads --undo
+fileorganizer ~/Downloads --undo
+
+# Check version
+fileorganizer --version
 ```
 
 ## Example Output
@@ -35,6 +35,15 @@ python organize.py ~/Downloads --undo
 Moved 4 file(s).
 Undo log saved. Run with --undo to revert.
 ```
+
+## Features
+
+- Sorts files into folders: Images, Documents, Videos, Audio, Archives, Code, Executables, Fonts, Data, Other
+- **Dry-run mode** — preview what will happen before moving anything
+- **Undo** — revert the last organize operation with a single command
+- Handles filename conflicts automatically
+- Skips hidden files and subdirectories
+- No external dependencies — pure Python 3.10+
 
 ## Supported Categories
 
