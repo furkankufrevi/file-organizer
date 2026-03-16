@@ -10,19 +10,31 @@ Usage:
 
 import argparse
 import json
-import os
 import shutil
 import sys
-from datetime import datetime
 from pathlib import Path
 
 CATEGORIES = {
-    "Images": {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".ico", ".tiff", ".heic"},
-    "Documents": {".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".odt", ".csv", ".rtf"},
-    "Videos": {".mp4", ".mov", ".avi", ".mkv", ".flv", ".wmv", ".webm", ".m4v"},
-    "Audio": {".mp3", ".wav", ".flac", ".aac", ".ogg", ".wma", ".m4a"},
+    "Images": {
+        ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg",
+        ".webp", ".ico", ".tiff", ".heic",
+    },
+    "Documents": {
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt",
+        ".pptx", ".txt", ".odt", ".csv", ".rtf",
+    },
+    "Videos": {
+        ".mp4", ".mov", ".avi", ".mkv", ".flv", ".wmv", ".webm", ".m4v",
+    },
+    "Audio": {
+        ".mp3", ".wav", ".flac", ".aac", ".ogg", ".wma", ".m4a",
+    },
     "Archives": {".zip", ".tar", ".gz", ".rar", ".7z", ".bz2", ".xz"},
-    "Code": {".py", ".js", ".ts", ".html", ".css", ".java", ".c", ".cpp", ".go", ".rs", ".rb", ".php", ".sh", ".json", ".yaml", ".yml", ".xml", ".sql", ".md"},
+    "Code": {
+        ".py", ".js", ".ts", ".html", ".css", ".java", ".c", ".cpp",
+        ".go", ".rs", ".rb", ".php", ".sh", ".json", ".yaml", ".yml",
+        ".xml", ".sql", ".md",
+    },
     "Executables": {".exe", ".msi", ".dmg", ".app", ".deb", ".rpm", ".bin"},
     "Fonts": {".ttf", ".otf", ".woff", ".woff2", ".eot"},
     "Data": {".db", ".sqlite", ".sqlite3", ".parquet", ".feather", ".hdf5"},
@@ -74,7 +86,7 @@ def undo(target_dir: Path) -> None:
         print("No log file found. Nothing to undo.")
         sys.exit(1)
 
-    with open(log_path) as f:
+    with open(log_path, encoding="utf-8") as f:
         moves = json.load(f)
 
     restored = 0
@@ -99,7 +111,10 @@ def main():
         description="Organize files in a directory by type."
     )
     parser.add_argument("directory", help="Target directory to organize")
-    parser.add_argument("--dry-run", action="store_true", help="Preview changes without moving files")
+    parser.add_argument(
+        "--dry-run", action="store_true",
+        help="Preview changes without moving files",
+    )
     parser.add_argument("--undo", action="store_true", help="Undo the last organize operation")
     args = parser.parse_args()
 
@@ -128,9 +143,9 @@ def main():
 
     if not args.dry_run:
         log_path = target / LOG_FILE
-        with open(log_path, "w") as f:
+        with open(log_path, "w", encoding="utf-8") as f:
             json.dump(moves, f, indent=2)
-        print(f"Undo log saved. Run with --undo to revert.")
+        print("Undo log saved. Run with --undo to revert.")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,41 @@
+name: Python CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pylint
+      - run: pylint organize.py --disable=C0114,C0115,C0116
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run dry-run smoke test
+        run: |
+          mkdir -p /tmp/test-dir
+          touch /tmp/test-dir/photo.jpg /tmp/test-dir/report.pdf /tmp/test-dir/song.mp3
+          python organize.py /tmp/test-dir --dry-run
+      - name: Run organize and undo
+        run: |
+          mkdir -p /tmp/test-dir2
+          touch /tmp/test-dir2/image.png /tmp/test-dir2/video.mp4 /tmp/test-dir2/data.csv
+          python organize.py /tmp/test-dir2
+          python organize.py /tmp/test-dir2 --undo
+          test -f /tmp/test-dir2/image.png && echo "Undo verified"
