@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install pylint
-      - run: pylint organize.py --disable=C0114,C0115,C0116
+      - run: pylint src/fileorganizer/ --disable=C0114,C0115,C0116
 
   test:
     runs-on: ubuntu-latest
@@ -27,15 +27,30 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - run: pip install .
       - name: Run dry-run smoke test
         run: |
           mkdir -p /tmp/test-dir
           touch /tmp/test-dir/photo.jpg /tmp/test-dir/report.pdf /tmp/test-dir/song.mp3
-          python organize.py /tmp/test-dir --dry-run
+          fileorganizer /tmp/test-dir --dry-run
       - name: Run organize and undo
         run: |
           mkdir -p /tmp/test-dir2
           touch /tmp/test-dir2/image.png /tmp/test-dir2/video.mp4 /tmp/test-dir2/data.csv
-          python organize.py /tmp/test-dir2
-          python organize.py /tmp/test-dir2 --undo
+          fileorganizer /tmp/test-dir2
+          fileorganizer /tmp/test-dir2 --undo
           test -f /tmp/test-dir2/image.png && echo "Undo verified"
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: python -m build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
