@@ -4,6 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from . import __version__
 from .organizer import organize, save_log, undo
 
 
@@ -24,7 +25,7 @@ def main():
     )
     parser.add_argument(
         "--version", action="version",
-        version=f"%(prog)s {_get_version()}",
+        version=f"%(prog)s {__version__}",
     )
     args = parser.parse_args()
 
@@ -58,11 +59,6 @@ def main():
     if not args.dry_run:
         save_log(target, moves)
         print("Undo log saved. Run with --undo to revert.")
-
-
-def _get_version():
-    from . import __version__
-    return __version__
 
 
 if __name__ == "__main__":
